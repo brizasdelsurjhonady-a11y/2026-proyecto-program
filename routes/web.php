@@ -2,9 +2,12 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LibroController;
+use App\Http\Controllers\AutorController;
 
 Route::get('/', function () {
-    return redirect('/libros');
+    return view('inicio');
 });
 
-Route::get('/libros', [LibroController::class, 'index']);
+Route::resource('libros', LibroController::class);
+
+Route::resource('autores', AutorController::class);

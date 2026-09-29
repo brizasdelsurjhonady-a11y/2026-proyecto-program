@@ -1,547 +1,258 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+@extends('layouts.app')
 
-    <title>Biblioteca Virtual</title>
+@section('title', 'Libros')
 
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+@section('page-title', 'Biblioteca')
 
-        body {
-            font-family: "Segoe UI", Arial, sans-serif;
-            background: #f3f6fa;
-            color: #1f2937;
-        }
+@section('content')
 
-        /* =========================
-           ENCABEZADO
-        ========================== */
+<div class="card">
 
-        header {
-            background: linear-gradient(135deg, #163a63, #2563a6);
-            color: white;
-            padding: 35px 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-        }
+    <div style="
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+    ">
 
-        .header-contenido {
-            max-width: 1200px;
-            margin: auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 20px;
-        }
+        <div>
+            <h3 style="
+                font-size: 26px;
+                color: #111827;
+                margin-bottom: 6px;
+            ">
+                📚 Biblioteca
+            </h3>
 
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
+            <p style="
+                color: #6b7280;
+                font-size: 14px;
+            ">
+                Explora y administra el catálogo de libros.
+            </p>
+        </div>
 
-        .logo-icono {
-            font-size: 48px;
-        }
+        <a
+            href="{{ route('libros.create') }}"
+            class="btn btn-primary"
+            style="
+                padding: 12px 18px;
+                font-weight: bold;
+            "
+        >
+            + Nuevo libro
+        </a>
 
-        .logo h1 {
-            font-size: 32px;
-            margin-bottom: 5px;
-        }
+    </div>
 
-        .logo p {
-            font-size: 15px;
-            opacity: 0.9;
-        }
 
-        .contador {
-            background: rgba(255, 255, 255, 0.15);
-            padding: 12px 18px;
-            border-radius: 12px;
-            text-align: center;
-            backdrop-filter: blur(5px);
-        }
+    @if(session('success'))
 
-        .contador strong {
-            display: block;
-            font-size: 25px;
-        }
-
-        .contador span {
-            font-size: 13px;
-        }
-
-        /* =========================
-           CONTENEDOR
-        ========================== */
-
-        .contenedor {
-            width: 92%;
-            max-width: 1200px;
-            margin: 35px auto;
-        }
-
-        .cabecera-seccion {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            gap: 20px;
-        }
-
-        .cabecera-seccion h2 {
-            color: #163a63;
-            font-size: 27px;
-        }
-
-        .cabecera-seccion p {
-            color: #6b7280;
-            margin-top: 5px;
-        }
-
-        /* =========================
-           BUSCADOR
-        ========================== */
-
-        .buscador {
-            margin-bottom: 30px;
-            background: white;
-            padding: 18px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
-        }
-
-        .buscador input {
-            width: 100%;
+        <div style="
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
             padding: 14px 18px;
-            border: 1px solid #d6dde6;
             border-radius: 10px;
-            font-size: 15px;
-            outline: none;
-            transition: 0.3s;
-        }
+            margin-bottom: 25px;
+        ">
+            ✅ {{ session('success') }}
+        </div>
 
-        .buscador input:focus {
-            border-color: #2563a6;
-            box-shadow: 0 0 0 3px rgba(37, 99, 166, 0.12);
-        }
+    @endif
 
-        /* =========================
-           GRID DE LIBROS
-        ========================== */
 
-        .libros {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 25px;
-        }
+    @if(session('error'))
 
-        /* =========================
-           TARJETA
-        ========================== */
+        <div style="
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        ">
+            ⚠️ {{ session('error') }}
+        </div>
 
-        .libro {
-            background: white;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.08);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            border: 1px solid #e8edf3;
-        }
+    @endif
 
-        .libro:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14);
-        }
 
-        /* =========================
-           PORTADA
-        ========================== */
+    <div style="
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 25px;
+        color: #6b7280;
+        font-size: 14px;
+    ">
 
-        .portada {
-            width: 100%;
-            height: 300px;
-            background: linear-gradient(135deg, #e9eef5, #dce5ef);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-        }
-
-        .portada img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-            transition: transform 0.4s ease;
-        }
-
-        .libro:hover .portada img {
-            transform: scale(1.04);
-        }
-
-        .portada-vacia {
-            text-align: center;
-            color: #64748b;
-            padding: 20px;
-        }
-
-        .portada-vacia .icono {
-            font-size: 55px;
-            display: block;
-            margin-bottom: 10px;
-        }
-
-        /* =========================
-           INFORMACIÓN
-        ========================== */
-
-        .informacion {
-            padding: 22px;
-        }
-
-        .libro h3 {
-            color: #163a63;
-            font-size: 21px;
-            margin-bottom: 15px;
-            line-height: 1.3;
-        }
-
-        .datos {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .dato {
-            display: flex;
-            gap: 8px;
-            align-items: flex-start;
-            font-size: 14px;
-            color: #4b5563;
-        }
-
-        .dato .icono {
-            width: 22px;
-            flex-shrink: 0;
-        }
-
-        .dato strong {
-            color: #1f2937;
-        }
-
-        /* =========================
-           ETIQUETAS
-        ========================== */
-
-        .etiquetas {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin: 15px 0;
-        }
-
-        .etiqueta {
-            display: inline-block;
-            padding: 6px 10px;
+        <span style="
+            background: #eff6ff;
+            color: #1d4ed8;
+            padding: 7px 12px;
             border-radius: 20px;
-            background: #e8f1fb;
-            color: #1d5d96;
-            font-size: 12px;
-            font-weight: 600;
-        }
+            font-weight: bold;
+        ">
+            {{ $libros->count() }} libros
+        </span>
 
-        .etiqueta.tipo {
-            background: #eef2ff;
-            color: #4f46a5;
-        }
+        registrados en el catálogo
 
-        /* =========================
-           PIE DE TARJETA
-        ========================== */
-
-        .pie-tarjeta {
-            margin-top: 18px;
-            padding-top: 15px;
-            border-top: 1px solid #edf0f3;
-            font-size: 12px;
-            color: #9ca3af;
-        }
-
-        /* =========================
-           SIN LIBROS
-        ========================== */
-
-        .sin-libros {
-            grid-column: 1 / -1;
-            background: white;
-            padding: 50px;
-            border-radius: 15px;
-            text-align: center;
-            color: #6b7280;
-            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.07);
-        }
-
-        .sin-libros .icono {
-            font-size: 55px;
-            margin-bottom: 15px;
-        }
-
-        /* =========================
-           PIE DE PÁGINA
-        ========================== */
-
-        footer {
-            margin-top: 60px;
-            background: #163a63;
-            color: white;
-            text-align: center;
-            padding: 25px;
-        }
-
-        footer p {
-            margin: 5px;
-            font-size: 14px;
-            opacity: 0.9;
-        }
-
-        /* =========================
-           RESPONSIVE
-        ========================== */
-
-        @media (max-width: 950px) {
-            .libros {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 650px) {
-
-            header {
-                padding: 25px 15px;
-            }
-
-            .header-contenido {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .logo {
-                justify-content: center;
-            }
-
-            .logo h1 {
-                font-size: 25px;
-            }
-
-            .logo-icono {
-                font-size: 38px;
-            }
-
-            .contador {
-                width: 100%;
-            }
-
-            .cabecera-seccion {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .libros {
-                grid-template-columns: 1fr;
-            }
-
-            .portada {
-                height: 330px;
-            }
-
-            .contenedor {
-                width: 94%;
-            }
-        }
-    </style>
-</head>
-
-<body>
-
-    <!-- =========================
-         ENCABEZADO
-    ========================== -->
-
-    <header>
-
-        <div class="header-contenido">
-
-            <div class="logo">
-
-                <div class="logo-icono">
-                    📚
-                </div>
-
-                <div>
-                    <h1>Biblioteca Virtual</h1>
-                    <p>Catálogo digital de libros</p>
-                </div>
-
-            </div>
-
-            <div class="contador">
-
-                <strong>{{ $libros->count() }}</strong>
-
-                <span>
-                    {{ $libros->count() == 1 ? 'Libro disponible' : 'Libros disponibles' }}
-                </span>
-
-            </div>
-
-        </div>
-
-    </header>
+    </div>
 
 
-    <!-- =========================
-         CONTENIDO PRINCIPAL
-    ========================== -->
+    @if($libros->count() > 0)
 
-    <main class="contenedor">
+        <div style="
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+        ">
 
-        <div class="cabecera-seccion">
+            @foreach($libros as $libro)
 
-            <div>
-                <h2>📖 Colección de libros</h2>
+                <div style="
+                    background: white;
+                    border: 1px solid #e5e7eb;
+                    border-radius: 16px;
+                    overflow: hidden;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+                    transition: transform 0.2s ease, box-shadow 0.2s ease;
+                ">
 
-                <p>
-                    Explora nuestra colección disponible.
-                </p>
-            </div>
+                    {{-- IMAGEN DEL LIBRO --}}
+                    <div style="
+                        height: 230px;
+                        background: #f3f4f6;
+                        position: relative;
+                        overflow: hidden;
+                    ">
 
-        </div>
-
-
-        <!-- =========================
-             BUSCADOR
-        ========================== -->
-
-        <div class="buscador">
-
-            <input
-                type="text"
-                id="buscador"
-                placeholder="🔎 Buscar por título, autor, género o editorial..."
-            >
-
-        </div>
-
-
-        <!-- =========================
-             LIBROS
-        ========================== -->
-
-        <div class="libros" id="lista-libros">
-
-            @forelse($libros as $libro)
-
-                <article
-                    class="libro"
-                    data-busqueda="
-                        {{ strtolower($libro->Titulo) }}
-                        {{ strtolower($libro->genero ?? '') }}
-                        {{ strtolower($libro->Tipo ?? '') }}
-                        {{ strtolower($libro->autor->Nombre ?? '') }}
-                        {{ strtolower($libro->autor->Apellidos ?? '') }}
-                        {{ strtolower($libro->editor->nombre_editorial ?? '') }}
-                    "
-                >
-
-                    <!-- PORTADA -->
-
-                    @if($libro->archivo)
-
-                        <div class="portada">
+                        @if($libro->archivo)
 
                             <img
                                 src="{{ $libro->archivo }}"
                                 alt="Portada de {{ $libro->Titulo }}"
-                                onerror="this.parentElement.innerHTML='<div class=&quot;portada-vacia&quot;><span class=&quot;icono&quot;>📕</span><span>Portada no disponible</span></div>';"
+                                style="
+                                    width: 100%;
+                                    height: 100%;
+                                    object-fit: cover;
+                                    display: block;
+                                "
+                                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
                             >
 
-                        </div>
-
-                    @else
-
-                        <div class="portada">
-
-                            <div class="portada-vacia">
-
-                                <span class="icono">
-                                    📕
-                                </span>
-
-                                <span>
-                                    Portada no disponible
-                                </span>
-
+                            <div style="
+                                display: none;
+                                width: 100%;
+                                height: 100%;
+                                align-items: center;
+                                justify-content: center;
+                                font-size: 65px;
+                                background: linear-gradient(135deg, #172554, #2563eb);
+                            ">
+                                📚
                             </div>
 
-                        </div>
+                        @else
 
-                    @endif
+                            <div style="
+                                width: 100%;
+                                height: 100%;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                font-size: 65px;
+                                background: linear-gradient(135deg, #172554, #2563eb);
+                            ">
+                                📚
+                            </div>
+
+                        @endif
 
 
-                    <!-- INFORMACIÓN -->
+                        {{-- TIPO --}}
+                        <span style="
+                            position: absolute;
+                            top: 14px;
+                            right: 14px;
+                            background: rgba(255,255,255,0.95);
+                            color: #1d4ed8;
+                            padding: 6px 10px;
+                            border-radius: 20px;
+                            font-size: 12px;
+                            font-weight: bold;
+                        ">
+                            {{ $libro->Tipo }}
+                        </span>
 
-                    <div class="informacion">
+                    </div>
 
-                        <h3>
+
+                    {{-- INFORMACIÓN --}}
+                    <div style="
+                        padding: 20px;
+                    ">
+
+                        <h3 style="
+                            color: #111827;
+                            font-size: 19px;
+                            margin-bottom: 8px;
+                            line-height: 1.3;
+                        ">
                             {{ $libro->Titulo }}
                         </h3>
 
 
-                        <!-- ETIQUETAS -->
+                        <div style="
+                            margin-bottom: 15px;
+                        ">
 
-                        <div class="etiquetas">
-
-                            @if($libro->Tipo)
-
-                                <span class="etiqueta tipo">
-                                    {{ $libro->Tipo }}
-                                </span>
-
-                            @endif
-
-
-                            @if($libro->genero)
-
-                                <span class="etiqueta">
-                                    {{ $libro->genero }}
-                                </span>
-
-                            @endif
+                            <span style="
+                                display: inline-block;
+                                background: #f3f4f6;
+                                color: #4b5563;
+                                padding: 5px 9px;
+                                border-radius: 6px;
+                                font-size: 12px;
+                            ">
+                                🏷️ {{ $libro->genero }}
+                            </span>
 
                         </div>
 
 
-                        <!-- DATOS -->
+                        {{-- AUTOR --}}
+                        <div style="
+                            display: flex;
+                            gap: 10px;
+                            align-items: flex-start;
+                            margin-bottom: 10px;
+                        ">
 
-                        <div class="datos">
+                            <span style="font-size: 18px;">
+                                ✍️
+                            </span>
 
-                            <!-- AUTOR -->
+                            <div>
 
-                            <div class="dato">
+                                <small style="
+                                    display: block;
+                                    color: #9ca3af;
+                                    font-size: 11px;
+                                    text-transform: uppercase;
+                                    margin-bottom: 2px;
+                                ">
+                                    Autor
+                                </small>
 
-                                <span class="icono">
-                                    👤
-                                </span>
-
-                                <div>
-
-                                    <strong>Autor</strong><br>
+                                <strong style="
+                                    color: #374151;
+                                    font-size: 13px;
+                                ">
 
                                     @if($libro->autor)
 
@@ -550,53 +261,92 @@
 
                                     @else
 
-                                        No registrado
+                                        Sin autor
 
                                     @endif
 
-                                </div>
+                                </strong>
 
                             </div>
 
+                        </div>
 
-                            <!-- EDITORIAL -->
 
-                            <div class="dato">
+                        {{-- EDITOR --}}
+                        <div style="
+                            display: flex;
+                            gap: 10px;
+                            align-items: flex-start;
+                            margin-bottom: 10px;
+                        ">
 
-                                <span class="icono">
-                                    🏢
-                                </span>
+                            <span style="font-size: 18px;">
+                                🏢
+                            </span>
 
-                                <div>
+                            <div>
 
-                                    <strong>Editorial</strong><br>
+                                <small style="
+                                    display: block;
+                                    color: #9ca3af;
+                                    font-size: 11px;
+                                    text-transform: uppercase;
+                                    margin-bottom: 2px;
+                                ">
+                                    Editor
+                                </small>
+
+                                <strong style="
+                                    color: #374151;
+                                    font-size: 13px;
+                                ">
 
                                     @if($libro->editor)
 
-                                        {{ $libro->editor->nombre_editorial }}
+                                        {{ $libro->editor->Nombre }}
+                                        {{ $libro->editor->Apellidos }}
 
                                     @else
 
-                                        No registrada
+                                        Sin editor
 
                                     @endif
 
-                                </div>
+                                </strong>
 
                             </div>
 
+                        </div>
 
-                            <!-- TRADUCTOR -->
 
-                            <div class="dato">
+                        {{-- TRADUCTOR --}}
+                        <div style="
+                            display: flex;
+                            gap: 10px;
+                            align-items: flex-start;
+                            margin-bottom: 18px;
+                        ">
 
-                                <span class="icono">
-                                    🌐
-                                </span>
+                            <span style="font-size: 18px;">
+                                🌐
+                            </span>
 
-                                <div>
+                            <div>
 
-                                    <strong>Traductor</strong><br>
+                                <small style="
+                                    display: block;
+                                    color: #9ca3af;
+                                    font-size: 11px;
+                                    text-transform: uppercase;
+                                    margin-bottom: 2px;
+                                ">
+                                    Traductor
+                                </small>
+
+                                <strong style="
+                                    color: #374151;
+                                    font-size: 13px;
+                                ">
 
                                     @if($libro->traductor)
 
@@ -605,104 +355,134 @@
 
                                     @else
 
-                                        No registrado
+                                        Sin traductor
 
                                     @endif
 
-                                </div>
+                                </strong>
 
                             </div>
 
                         </div>
 
 
-                        <!-- PIE DE TARJETA -->
+                        {{-- BOTONES --}}
+                        <div style="
+                            border-top: 1px solid #e5e7eb;
+                            padding-top: 15px;
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            gap: 8px;
+                        ">
 
-                        <div class="pie-tarjeta">
+                            <span style="
+                                color: #9ca3af;
+                                font-size: 12px;
+                            ">
+                                ID #{{ $libro->ID_libro }}
+                            </span>
 
-                            📚 Biblioteca Virtual
+
+                            <div style="
+                                display: flex;
+                                gap: 6px;
+                            ">
+
+                                {{-- EDITAR --}}
+                                <a
+                                    href="{{ route('libros.edit', $libro->ID_libro) }}"
+                                    class="btn"
+                                    style="
+                                        background: #fef3c7;
+                                        color: #92400e;
+                                        padding: 8px 11px;
+                                        font-size: 12px;
+                                    "
+                                >
+                                    ✏️ Editar
+                                </a>
+
+
+                                {{-- ELIMINAR --}}
+                                <form
+                                    action="{{ route('libros.destroy', $libro->ID_libro) }}"
+                                    method="POST"
+                                    style="display: inline;"
+                                >
+
+                                    @csrf
+
+                                    @method('DELETE')
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-danger"
+                                        style="
+                                            padding: 8px 11px;
+                                            font-size: 12px;
+                                        "
+                                        onclick="return confirm('¿Estás seguro de eliminar este libro?')"
+                                    >
+                                        🗑️ Eliminar
+                                    </button>
+
+                                </form>
+
+                            </div>
 
                         </div>
 
                     </div>
 
-                </article>
-
-            @empty
-
-                <div class="sin-libros">
-
-                    <div class="icono">
-                        📚
-                    </div>
-
-                    <h3>
-                        No hay libros registrados
-                    </h3>
-
-                    <p>
-                        Actualmente no existen libros disponibles en la biblioteca.
-                    </p>
-
                 </div>
 
-            @endforelse
+            @endforeach
 
         </div>
 
-    </main>
+    @else
 
+        <div style="
+            text-align: center;
+            padding: 70px 20px;
+            border: 2px dashed #d1d5db;
+            border-radius: 16px;
+            background: #f9fafb;
+        ">
 
-    <!-- =========================
-         PIE DE PÁGINA
-    ========================== -->
+            <div style="
+                font-size: 60px;
+                margin-bottom: 15px;
+            ">
+                📚
+            </div>
 
-    <footer>
+            <h3 style="
+                color: #374151;
+                margin-bottom: 8px;
+            ">
+                No hay libros registrados
+            </h3>
 
-        <p>
-            📚 Biblioteca Virtual
-        </p>
+            <p style="
+                color: #9ca3af;
+                margin-bottom: 20px;
+            ">
+                Comienza agregando el primer libro al catálogo.
+            </p>
 
-        <p>
-            Sistema de gestión y consulta de libros
-        </p>
+            <a
+                href="{{ route('libros.create') }}"
+                class="btn btn-primary"
+            >
+                + Registrar primer libro
+            </a>
 
-    </footer>
+        </div>
 
+    @endif
 
-    <!-- =========================
-         BUSCADOR CON JAVASCRIPT
-    ========================== -->
+</div>
 
-    <script>
-
-        const buscador = document.getElementById('buscador');
-
-        const libros = document.querySelectorAll('.libro');
-
-        buscador.addEventListener('input', function () {
-
-            const texto = this.value.toLowerCase().trim();
-
-            libros.forEach(function (libro) {
-
-                const contenido = libro.dataset.busqueda.toLowerCase();
-
-                if (contenido.includes(texto)) {
-
-                    libro.style.display = '';
-
-                } else {
-
-                    libro.style.display = 'none';
-
-                }
-
-            });
-
-        });
-
-    </script>
-
-</body>
-</html>
+@endsection
